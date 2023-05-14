@@ -1,0 +1,59 @@
+Matei Costescu 323CA
+matei.costescu1923@gmail.com
+
+TEMA 1 PCOM
+
+I organized this homework in two main problems, each with with 2 main chapters
+	-IP
+		-ICMP
+		-Best route-table-entry
+	-ARP
+		-Request
+		-Reply
+
+
+* IP *
+- ICMP -
+
+The main problem here was if he had an ICMP ECHO addressed to us. In that
+case we have to send back a reply messege. We do that by swaping the 
+destination and source from the original IP header, change the tpye to
+ECHO REPLY and then update the checksum.
+
+We also have some issues that we have to deal with in this same category.
+If we ever have package that has no more time to live or a package we can't 
+find a route table entry, we have to reply the specific error we encountered
+
+- Best route table entry -
+
+ This would generally be very easy however to optimize the time a little 
+ instead of searching the table through simple iteration we sorted the entry
+ table and searched faster using Binary search. After that we can just send
+ the packet to the next hop. There are some addition complications once we
+ implement our own ARP system
+ 
+ * ARP *
+ 
+ - Request -
+ 
+ If the request is not for us we can ignore it, otherwise we need to reply,
+ which can easily be doen inverting the target and source address again
+ 
+ - Reply -
+ 
+ This is a little more complicated than the request. We have to first add the
+ new mac address we received to the ARP table. Now because we have a new entry
+ we have to check if any of the packets we have in our waiting queue 
+ coresspond to the new mac address. We do that by getting the packet, 
+ calculating the best route entry for all the packets, and seeing if the next
+ hop is in our ARP table. If we unlcoked the mac address we can now sends 
+ them. The rest of the packets are added back to the queue.
+ 
+ - Waiting queue -
+ 
+ This is acutally implemented in the IP section, but I believe it is more
+ relevant for the ARP implementation. This consists of all the packets we 
+ calculate the besr route entry from our table, but the MAC addres for the IP
+ address is not yet knowned. So we add it to the queue and send a broadcast
+ request to anyone in the network to ask if anyone has the MAC address for
+ that specific IP. And then we wait for our reply with the instructions above.
